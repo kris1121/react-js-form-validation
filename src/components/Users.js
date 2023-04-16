@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import useAxiosPrivate from "../hooks/useAxiosPrivarate";
@@ -8,16 +8,20 @@ const Users = () => {
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
     const location = useLocation();
+    const effRan = useRef(false);
 
     useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
     
             
+        if (effRan.current === true) {
+
+
             const getUsers = async () => {
                 try {
                     const response = await axiosPrivate.get("/users", {
-                        // signal: controller.signal
+                        signal: controller.signal
                     })
                     console.log(response.data);
                     isMounted && setUsers(response.data);
@@ -28,10 +32,13 @@ const Users = () => {
             }
     
             getUsers();
+
+        }
     
             return () => {
                 isMounted = false;
                 controller.abort();
+                effRan.current = true;
             }
     }, [])
 
